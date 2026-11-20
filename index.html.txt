@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yasa İttifakı - Canlı Oylama (20 Oy Hakkı)</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --surface: #131a2a;
+      --surface-2: #1b253b;
+      --border: #2a3754;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --r5: #f59e0b;
+      --r4: #a855f7;
+      --r3: #3b82f6;
+      --r2: #10b981;
+      --r1: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding-bottom: 96px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+    }
+
+    .header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .brand p {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--warning);
+    }
+
+    .dot.live {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+    }
+
+    .btn-secondary:hover {
+      background: #24314e;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 0.88rem;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 16px auto;
+      padding: 0 16px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .search-sort {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-input, select {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 210px;
+    }
+
+    .search-input:focus, select:focus, textarea:focus, input:focus {
+      border-color: var(--accent);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .tab {
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform 0.12s ease, border-color 0.15s ease;
+    }
+
+    .card.selected {
+      border-color: var(--accent);
+      background: linear-gradient(180deg, rgba(59, 130, 246, 0.14), var(--surface));
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .member-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .member-info {
+      min-width: 0;
+    }
+
+    .member-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .member-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .rank-pill {
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: #0b0f19;
+    }
+
+    .rank-R5 { background: var(--r5); }
+    .rank-R4 { background: var(--r4); color: #fff; }
+    .rank-R3 { background: var(--r3); color: #fff; }
+    .rank-R2 { background: var(--r2); color: #06281e; }
+    .rank-R1 { background: var(--r1); color: #fff; }
+
+    .vote-count-box {
+      text-align: right;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 5px 9px;
+      flex-shrink: 0;
+    }
+
+    .vote-num {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #93c5fd;
+      display: block;
+      line-height: 1.1;
+    }
+
+    .vote-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .vote-btn {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 0.84rem;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .vote-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.18);
+    }
+
+    .vote-btn.voted {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .vote-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: rgba(19, 26, 42, 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+
+    .bottom-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .quota-text strong {
+      color: #60a5fa;
+      font-size: 1.05rem;
+    }
+
+    .quota-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .bottom-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .modal-header h2 {
+      font-size: 1.05rem;
+    }
+
+    .close-btn {
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.25rem;
+      padding: 4px 8px;
+    }
+
+    .leader-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(42, 55, 84, 0.55);
+      font-size: 0.88rem;
+    }
+
+    .leader-item:last-child {
+      border-bottom: none;
+    }
+
+    textarea, input[type="text"], input[type="password"] {
+      width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 0.84rem;
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+
+    textarea {
+      min-height: 150px;
+      font-family: monospace;
+    }
+
+    .toast {
+      position: fixed;
+      top: 76px;
+      right: 16px;
+      z-index: 60;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>Yasa İttifakı Canlı Oylama</h1>
+        <p>95 Üye (1 R5 • 10 R4 • 51 R3 • 8 R2 • 25 R1) • Kişi Başı 20 Oy Hakkı</p>
+      </div>
+      <div class="status-row">
+        <span class="badge" id="modeBadge">
+          <span class="dot" id="modeDot"></span>
+          <span id="modeText">Yerel Mod</span>
+        </span>
+        <button class="btn-secondary" id="openResultsBtn">Sonuçlar</button>
+        <button class="btn-secondary" id="openFirebaseBtn">Firebase</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="controls">
+      <div class="search-sort">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Üye adı veya rütbe ara..."
+        />
+        <select id="sortSelect">
+          <option value="default">Sıralama: Rütbe & Liste</option>
+          <option value="votes_desc">En Çok Oy Alanlar</option>
+          <option value="cp_desc">En Yüksek Savaş Gücü (CP)</option>
+          <option value="name_asc">İsme Göre (A-Z)</option>
+        </select>
+      </div>
+      <div class="tabs" id="rankTabs"></div>
+    </section>
+
+    <section class="grid" id="membersGrid"></section>
+  </main>
+
+  <footer class="bottom-bar">
+    <div class="bottom-inner">
+      <div class="quota-text">
+        <div>Seçilen: <strong id="selectedCount">0</strong> / 20 • Kalan Oy: <strong id="remainingCount">20</strong></div>
+        <div class="quota-sub" id="userVoteStatus">Henüz oy gönderilmedi</div>
+      </div>
+      <div class="bottom-actions">
+        <button class="btn-secondary" id="clearSelectionBtn">Seçimi Temizle</button>
+        <button class="btn-primary" id="submitVotesBtn" disabled>Oyları Gönder</button>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="resultsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Canlı Sıralama & Sonuçlar</h2>
+        <button class="close-btn" data-close="resultsModal">✕</button>
+      </div>
+      <div id="leaderList"></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
+        <button class="btn-secondary" id="copyResultsBtn">Sonuçları Kopyala</button>
+        <button class="btn-danger" id="resetVotesBtn">Oyları Sıfırla (Yönetici)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="firebaseModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Firebase Canlı Veritabanı Ayarı</h2>
+        <button class="close-btn" data-close="firebaseModal">✕</button>
+      </div>
+      <p style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">
+        Tüm üyelerin oylarının tek bir canlı sayaçta birleşmesi için Firebase projenizdeki <code>firebaseConfig</code> nesnesini yapıştırın. Boş bırakılırsa cihaz içi yerel mod çalışır.
+      </p>
+      <label style="font-size:0.82rem; font-weight:600;">firebaseConfig (JSON veya JS objesi)</label>
+      <textarea id="firebaseConfigInput" placeholder='{
+  "apiKey": "...",
+  "authDomain": "...",
+  "projectId": "...",
+  "storageBucket": "...",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn-primary" id="saveFirebaseBtn">Bağlan ve Kaydet</button>
+        <button class="btn-secondary" id="disconnectFirebaseBtn">Yerel Moda Dön</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      onSnapshot,
+      runTransaction,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const MAX_VOTES = 20;
+    const ADMIN_PIN = "2178";
+    const STORAGE_VOTES_KEY = "yasa_live_votes_v1";
+    const STORAGE_USER_PICKS_KEY = "yasa_user_picks_v1";
+    const STORAGE_FB_CONFIG_KEY = "yasa_firebase_config_v1";
+
+    const MEMBERS = [
+      // R5 (1)
+      { id: "r5_1", name: "Özii ऐ", rank: "R5", cp: 0 },
+
+      // R4 (10)
+      { id: "r4_1", name: "HURRICANE", rank: "R4", cp: 128.3 },
+      { id: "r4_2", name: "EL SEROKA", rank: "R4", cp: 183.3 },
+      { id: "r4_3", name: "Commander 1bcd41178", rank: "R4", cp: 147.1 },
+      { id: "r4_4", name: "Mantar ヤ", rank: "R4", cp: 147.0 },
+      { id: "r4_5", name: "TACO 乂", rank: "R4", cp: 158.1 },
+      { id: "r4_6", name: "ToksikGollum々", rank: "R4", cp: 149.4 },
+      { id: "r4_7", name: "M E F T U N々", rank: "R4", cp: 139.7 },
+      { id: "r4_8", name: "S H E R I F F", rank: "R4", cp: 143.4 },
+      { id: "r4_9", name: "Quenn Lilyy 乂", rank: "R4", cp: 159.0 },
+      { id: "r4_10", name: "B A N K A I", rank: "R4", cp: 171.4 },
+
+      // R3 (51)
+      { id: "r3_1", name: "O N U R", rank: "R3", cp: 158.7 },
+      { id: "r3_2", name: "Asi Ruhh", rank: "R3", cp: 108.4 },
+      { id: "r3_3", name: "SΣZΘSΔZ", rank: "R3", cp: 127.8 },
+      { id: "r3_4", name: "Gülayımsı", rank: "R3", cp: 152.4 },
+      { id: "r3_5", name: "Geylaniii", rank: "R3", cp: 121.4 },
+      { id: "r3_6", name: "ALABORA乂", rank: "R3", cp: 131.2 },
+      { id: "r3_7", name: "BEN EFSANEYİMツ", rank: "R3", cp: 132.4 },
+      { id: "r3_8", name: "AYAANO", rank: "R3", cp: 108.2 },
+      { id: "r3_9", name: "Nikudon", rank: "R3", cp: 121.1 },
+      { id: "r3_10", name: "1يماني هيبه", rank: "R3", cp: 111.0 },
+      { id: "r3_11", name: "K U R T 6 1", rank: "R3", cp: 132.8 },
+      { id: "r3_12", name: "bgrdmrl", rank: "R3", cp: 116.7 },
+      { id: "r3_13", name: "SİR x WALLEYY", rank: "R3", cp: 110.3 },
+      { id: "r3_14", name: "SERDENGEÇTİ", rank: "R3", cp: 115.4 },
+      { id: "r3_15", name: "Pedro البربري", rank: "R3", cp: 105.0 },
+      { id: "r3_16", name: "Tâkø", rank: "R3", cp: 127.7 },
+      { id: "r3_17", name: "ElRoNd", rank: "R3", cp: 101.9 },
+      { id: "r3_18", name: "RoNiN29", rank: "R3", cp: 126.0 },
+      { id: "r3_19", name: "cagrijk", rank: "R3", cp: 135.1 },
+      { id: "r3_20", name: "UgurKLK", rank: "R3", cp: 0 },
+      { id: "r3_21", name: "Oğuz Göztepe", rank: "R3", cp: 109.3 },
+      { id: "r3_22", name: "MangalWariors", rank: "R3", cp: 106.4 },
+      { id: "r3_23", name: "İHTİYAR DAYI", rank: "R3", cp: 125.4 },
+      { id: "r3_24", name: "Hey KeL", rank: "R3", cp: 130.5 },
+      { id: "r3_25", name: "HKMTechxylit", rank: "R3", cp: 134.0 },
+      { id: "r3_26", name: "xhunter ツ", rank: "R3", cp: 184.3 },
+      { id: "r3_27", name: "Emilio Escobar", rank: "R3", cp: 110.9 },
+      { id: "r3_28", name: "MigoOo0", rank: "R3", cp: 101.6 },
+      { id: "r3_29", name: "eiraviora", rank: "R3", cp: 130.9 },
+      { id: "r3_30", name: "HELVA", rank: "R3", cp: 123.4 },
+      { id: "r3_31", name: "HERBAWY", rank: "R3", cp: 108.4 },
+      { id: "r3_32", name: "x War Lord x", rank: "R3", cp: 122.3 },
+      { id: "r3_33", name: "亗EXCELLENCY亗", rank: "R3", cp: 138.4 },
+      { id: "r3_34", name: "Commander194A", rank: "R3", cp: 133.9 },
+      { id: "r3_35", name: "yAsAGodFather", rank: "R3", cp: 115.3 },
+      { id: "r3_36", name: "7unç", rank: "R3", cp: 111.4 },
+      { id: "r3_37", name: "SA N C AK", rank: "R3", cp: 114.7 },
+      { id: "r3_38", name: "ĞĤÄŻÄ", rank: "R3", cp: 120.9 },
+      { id: "r3_39", name: "ESOS10", rank: "R3", cp: 159.2 },
+      { id: "r3_40", name: "betusperi", rank: "R3", cp: 140.2 },
+      { id: "r3_41", name: "Aykut", rank: "R3", cp: 106.0 },
+      { id: "r3_42", name: "20Horozkentli20", rank: "R3", cp: 104.3 },
+      { id: "r3_43", name: "亗JØKER亗", rank: "R3", cp: 120.0 },
+      { id: "r3_44", name: "Mutibey", rank: "R3", cp: 88.0 },
+      { id: "r3_45", name: "MyShaylaఇ", rank: "R3", cp: 181.6 },
+      { id: "r3_46", name: "Madam LilÖzGül", rank: "R3", cp: 131.3 },
+      { id: "r3_47", name: "resistanceTr", rank: "R3", cp: 85.8 },
+      { id: "r3_48", name: "EL PATRÒN", rank: "R3", cp: 108.3 },
+      { id: "r3_49", name: "Just A Bush", rank: "R3", cp: 131.0 },
+      { id: "r3_50", name: "U N O", rank: "R3", cp: 145.7 },
+      { id: "r3_51", name: "Banshee64", rank: "R3", cp: 95.5 },
+
+      // R2 (8)
+      { id: "r2_1", name: "MiHo", rank: "R2", cp: 156.7 },
+      { id: "r2_2", name: "emel35", rank: "R2", cp: 137.8 },
+      { id: "r2_3", name: "Saif Allah", rank: "R2", cp: 125.7 },
+      { id: "r2_4", name: "KATEツ", rank: "R2", cp: 102.8 },
+      { id: "r2_5", name: "TANRININKULU", rank: "R2", cp: 120.6 },
+      { id: "r2_6", name: "MyLumínary", rank: "R2", cp: 166.2 },
+      { id: "r2_7", name: "d MATT b", rank: "R2", cp: 148.0 },
+      { id: "r2_8", name: "YASALANDIK", rank: "R2", cp: 131.0 },
+
+      // R1 (25)
+      { id: "r1_1", name: "Yasay07", rank: "R1", cp: 105.4 },
+      { id: "r1_2", name: "peçe53", rank: "R1", cp: 108.1 },
+      { id: "r1_3", name: "ReSpeCT", rank: "R1", cp: 107.1 },
+      { id: "r1_4", name: "K O R II", rank: "R1", cp: 104.6 },
+      { id: "r1_5", name: "HasaN19031903", rank: "R1", cp: 148.6 },
+      { id: "r1_6", name: "Lycntzz", rank: "R1", cp: 87.9 },
+      { id: "r1_7", name: "xX Commander Quen Xx", rank: "R1", cp: 94.3 },
+      { id: "r1_8", name: "Snnkrs", rank: "R1", cp: 134.3 },
+      { id: "r1_9", name: "Ömertugrul69", rank: "R1", cp: 85.8 },
+      { id: "r1_10", name: "Im RajjMaholtraa", rank: "R1", cp: 96.6 },
+      { id: "r1_11", name: "OmrGnyy", rank: "R1", cp: 98.3 },
+      { id: "r1_12", name: "Aze Of Legends", rank: "R1", cp: 95.8 },
+      { id: "r1_13", name: "Syatkın", rank: "R1", cp: 85.9 },
+      { id: "r1_14", name: "NothingGone", rank: "R1", cp: 91.8 },
+      { id: "r1_15", name: "V3X4666", rank: "R1", cp: 105.4 },
+      { id: "r1_16", name: "YASALANDIK", rank: "R1", cp: 144.8 },
+      { id: "r1_17", name: "E S T O", rank: "R1", cp: 105.7 },
+      { id: "r1_18", name: "Şüheda253", rank: "R1", cp: 100.6 },
+      { id: "r1_19", name: "Big irvo", rank: "R1", cp: 123.0 },
+      { id: "r1_20", name: "Tyypkrkmz", rank: "R1", cp: 105.5 },
+      { id: "r1_21", name: "AYAZ 1453", rank: "R1", cp: 99.6 },
+      { id: "r1_22", name: "Tulgarツ", rank: "R1", cp: 98.0 },
+      { id: "r1_23", name: "KARABEYYY", rank: "R1", cp: 101.7 },
+      { id: "r1_24", name: "JemeDusun", rank: "R1", cp: 94.0 },
+      { id: "r1_25", name: "BOZOK ツ", rank: "R1", cp: 130.4 }
+    ];
+
+    let activeRank = "ALL";
+    let searchQuery = "";
+    let sortMode = "default";
+    let votesMap = loadLocalVotes();
+    let userSubmittedPicks = loadUserPicks();
+    let selectedIds = new Set(userSubmittedPicks);
+    let isLiveFirebase = false;
+    let db = null;
+    let auth = null;
+    let currentUid = null;
+    let unsubscribeSnapshot = null;
+
+    function loadLocalVotes() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_VOTES_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveLocalVotes(map) {
+      localStorage.setItem(STORAGE_VOTES_KEY, JSON.stringify(map));
+    }
+
+    function loadUserPicks() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_USER_PICKS_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveUserPicks(picks) {
+      localStorage.setItem(STORAGE_USER_PICKS_KEY, JSON.stringify(picks));
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove("show"), 2600);
+    }
+
+    function getInitials(name) {
+      const clean = name.replace(/[^\p{L}\p{N}\s]/gu, "").trim();
+      if (!clean) return "Ü";
+      const parts = clean.split(/\s+/);
+      return parts.length > 1
+        ? (parts[0][0] + parts[1][0]).toUpperCase()
+        : clean.slice(0, 2).toUpperCase();
+    }
+
+    function getAvatarColor(id) {
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const hue = Math.abs(hash) % 360;
+      return `hsl(${hue}, 62%, 42%)`;
+    }
+
+    function setConnectionStatus(live, label) {
+      isLiveFirebase = live;
+      const dot = document.getElementById("modeDot");
+      const text = document.getElementById("modeText");
+      dot.classList.toggle("live", live);
+      text.textContent = label;
+    }
+
+    function parseFirebaseConfig(raw) {
+      const trimmed = raw.trim();
+      if (!trimmed) return null;
+      try {
+        return JSON.parse(trimmed);
+      } catch {
+        const normalized = trimmed
+          .replace(/const\s+firebaseConfig\s*=\s*/i, "")
+          .replace(/;\s*$/, "")
+          .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
+          .replace(/'/g, '"');
+        return JSON.parse(normalized);
+      }
+    }
+
+    async function initFirebase(cfg) {
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+        unsubscribeSnapshot = null;
+      }
+      if (!cfg) {
+        db = null;
+        auth = null;
+        setConnectionStatus(false, "Yerel Mod");
+        renderAll();
+        return;
+      }
+
+      try {
+        const appName = "yasa_voting_app";
+        const existing = getApps().find(a => a.name === appName);
+        const app = existing || initializeApp(cfg, appName);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        setConnectionStatus(false, "Bağlanıyor...");
+        await signInAnonymously(auth);
+
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            currentUid = user.uid;
+            const userDocRef = doc(db, "yasa_vote_ballots", currentUid);
+            const snap = await getDoc(userDocRef);
+            if (snap.exists() && Array.isArray(snap.data().picks)) {
+              userSubmittedPicks = snap.data().picks.slice(0, MAX_VOTES);
+              selectedIds = new Set(userSubmittedPicks);
+              saveUserPicks(userSubmittedPicks);
+              updateBottomBar();
+            }
+          }
+        });
+
+        const tallyRef = doc(db, "yasa_voting", "live_tally");
+        unsubscribeSnapshot = onSnapshot(tallyRef, async (snap) => {
+          if (snap.exists()) {
+            votesMap = snap.data().counts || {};
+            setConnectionStatus(true, "Canlı (Firebase)");
+            renderAll();
+          } else {
+            const initialCounts = {};
+            MEMBERS.forEach(m => { initialCounts[m.id] = 0; });
+            await setDoc(tallyRef, { counts: initialCounts, updatedAt: serverTimestamp() });
+          }
+        }, (err) => {
+          console.error(err);
+          setConnectionStatus(false, "Firebase Hatası");
+          showToast("Firebase okuma izni veya yapılandırmasını kontrol edin.");
+        });
+      } catch (err) {
+        console.error(err);
+        setConnectionStatus(false, "Yerel Mod");
+        showToast("Firebase bağlantısı kurulamadı.");
+      }
+    }
+
+    function renderTabs() {
+      const counts = {
+        ALL: MEMBERS.length,
+        R5: MEMBERS.filter(m => m.rank === "R5").length,
+        R4: MEMBERS.filter(m => m.rank === "R4").length,
+        R3: MEMBERS.filter(m => m.rank === "R3").length,
+        R2: MEMBERS.filter(m => m.rank === "R2").length,
+        R1: MEMBERS.filter(m => m.rank === "R1").length
+      };
+      const labels = {
+        ALL: `Tümü (${counts.ALL})`,
+        R5: `R5 (${counts.R5})`,
+        R4: `R4 (${counts.R4})`,
+        R3: `R3 (${counts.R3})`,
+        R2: `R2 (${counts.R2})`,
+        R1: `R1 (${counts.R1})`
+      };
+
+      const tabsEl = document.getElementById("rankTabs");
+      tabsEl.innerHTML = Object.keys(labels).map(rank => `
+        <button class="tab ${activeRank === rank ? "active" : ""}" data-rank="${rank}">
+          ${labels[rank]}
+        </button>
+      `).join("");
+
+      tabsEl.querySelectorAll(".tab").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeRank = btn.dataset.rank;
+          renderTabs();
+          renderGrid();
+        });
+      });
+    }
+
+    function getFilteredMembers() {
+      const q = searchQuery.trim().toLowerCase();
+      let list = MEMBERS.filter(m => {
+        const matchesRank = activeRank === "ALL" || m.rank === activeRank;
+        const matchesSearch = !q || m.name.toLowerCase().includes(q) || m.rank.toLowerCase().includes(q);
+        return matchesRank && matchesSearch;
+      });
+
+      if (sortMode === "votes_desc") {
+        list.sort((a, b) => (votesMap[b.id] || 0) - (votesMap[a.id] || 0));
+      } else if (sortMode === "cp_desc") {
+        list.sort((a, b) => (b.cp || 0) - (a.cp || 0));
+      } else if (sortMode === "name_asc") {
+        list.sort((a, b) => a.name.localeCompare(b.name, "tr"));
+      }
+
+      return list;
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById("membersGrid");
+      const list = getFilteredMembers();
+
+      if (list.length === 0) {
+        grid.innerHTML = `<p style="color:var(--muted); grid-column:1/-1; text-align:center; padding:32px;">Aramanıza uygun üye bulunamadı.</p>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(m => {
+        const isSelected = selectedIds.has(m.id);
+        const voteCount = votesMap[m.id] || 0;
+        const limitReached = !isSelected && selectedIds.size >= MAX_VOTES;
+        const cpText = m.cp > 0 ? `${m.cp.toFixed(1)}M CP` : "R5 Reis";
+
+        return `
+          <div class="card ${isSelected ? "selected" : ""}">
+            <div class="card-top">
+              <div class="member-left">
+                <div class="avatar" style="background:${getAvatarColor(m.id)}">${getInitials(m.name)}</div>
+                <div class="member-info">
+                  <div class="member-name" title="${m.name}">${m.name}</div>
+                  <div class="member-meta">
+                    <span class="rank-pill rank-${m.rank}">${m.rank}</span>
+                    <span>${cpText}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="vote-count-box">
+                <span class="vote-num">${voteCount}</span>
+                <span class="vote-label">Oy</span>
+              </div>
+            </div>
+            <button
+              class="vote-btn ${isSelected ? "voted" : ""}"
+              data-id="${m.id}"
+              ${limitReached ? "disabled" : ""}
+            >
+              ${isSelected ? "✓ Seçildi (Kaldır)" : limitReached ? "20 Oy Limiti Doldu" : "+ Oy Ver"}
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll(".vote-btn").forEach(btn => {
+        btn.addEventListener("click", () => toggleSelect(btn.dataset.id));
+      });
+    }
+
+    function toggleSelect(id) {
+      if (selectedIds.has(id)) {
+        selectedIds.delete(id);
+      } else {
+        if (selectedIds.size >= MAX_VOTES) {
+          showToast(`En fazla ${MAX_VOTES} kişi seçebilirsiniz!`);
+          return;
+        }
+        selectedIds.add(id);
+      }
+      updateBottomBar();
+      renderGrid();
+    }
+
+    function updateBottomBar() {
+      const count = selectedIds.size;
+      const rem = MAX_VOTES - count;
+      document.getElementById("selectedCount").textContent = count;
+      document.getElementById("remainingCount").textContent = rem;
+      document.getElementById("submitVotesBtn").disabled = count === 0;
+
+      const statusEl = document.getElementById("userVoteStatus");
+      if (userSubmittedPicks.length > 0) {
+        statusEl.textContent = `Bu cihazdan gönderilmiş ${userSubmittedPicks.length} oy kaydı var`;
+      } else {
+        statusEl.textContent = "Oylarınızı seçip 'Oyları Gönder' butonuna basın";
+      }
+    }
+
+    async function submitVotes() {
+      const newPicks = Array.from(selectedIds);
+      if (newPicks.length === 0) return;
+      if (newPicks.length > MAX_VOTES) {
+        showToast(`En fazla ${MAX_VOTES} oy gönderebilirsiniz.`);
+        return;
+      }
+
+      const prevSet = new Set(userSubmittedPicks);
+      const nextSet = new Set(newPicks);
+      const deltas = {};
+
+      MEMBERS.forEach(m => {
+        const had = prevSet.has(m.id) ? 1 : 0;
+        const has = nextSet.has(m.id) ? 1 : 0;
+        if (has - had !== 0) {
+          deltas[m.id] = has - had;
+        }
+      });
+
+      if (isLiveFirebase && db) {
+        try {
+          const tallyRef = doc(db, "yasa_voting", "live_tally");
+          const ballotRef = currentUid ? doc(db, "yasa_vote_ballots", currentUid) : null;
+
+          await runTransaction(db, async (tx) => {
+            const tallySnap = await tx.get(tallyRef);
+            const currentCounts = tallySnap.exists() ? { ...(tallySnap.data().counts || {}) } : {};
+
+            Object.entries(deltas).forEach(([id, diff]) => {
+              currentCounts[id] = Math.max(0, (currentCounts[id] || 0) + diff);
+            });
+
+            tx.set(tallyRef, { counts: currentCounts, updatedAt: serverTimestamp() }, { merge: true });
+            if (ballotRef) {
+              tx.set(ballotRef, { picks: newPicks, updatedAt: serverTimestamp() }, { merge: true });
+            }
+          });
+
+          userSubmittedPicks = newPicks;
+          saveUserPicks(userSubmittedPicks);
+          updateBottomBar();
+          showToast(`${newPicks.length} oy canlı veritabanına kaydedildi!`);
+        } catch (err) {
+          console.error(err);
+          showToast("Oy gönderilirken hata oluştu.");
+        }
+      } else {
+        Object.entries(deltas).forEach(([id, diff]) => {
+          votesMap[id] = Math.max(0, (votesMap[id] || 0) + diff);
+        });
+        saveLocalVotes(votesMap);
+        userSubmittedPicks = newPicks;
+        saveUserPicks(userSubmittedPicks);
+        updateBottomBar();
+        renderAll();
+        showToast(`${newPicks.length} oy kaydedildi (Yerel Mod).`);
+      }
+    }
+
+    function openResultsModal() {
+      const ranked = [...MEMBERS]
+        .map(m => ({ ...m, votes: votesMap[m.id] || 0 }))
+        .sort((a, b) => b.votes - a.votes || b.cp - a.cp);
+
+      const totalVotesCast = ranked.reduce((acc, item) => acc + item.votes, 0);
+      const listEl = document.getElementById("leaderList");
+
+      listEl.innerHTML = `
+        <p style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">
+          Toplam Verilen Oy: <strong style="color:var(--text)">${totalVotesCast}</strong>
+        </p>
+        ${ranked.slice(0, 30).map((m, idx) => `
+          <div class="leader-item">
+            <span><strong>#${idx + 1}</strong> ${m.name} <small style="color:var(--muted)">(${m.rank})</small></span>
+            <strong style="color:#60a5fa">${m.votes} Oy</strong>
+          </div>
+        `).join("")}
+      `;
+
+      document.getElementById("resultsModal").classList.add("open");
+    }
+
+    function copyResultsText() {
+      const ranked = [...MEMBERS]
+        .map(m => ({ ...m, votes: votesMap[m.id] || 0 }))
+        .sort((a, b) => b.votes - a.votes || b.cp - a.cp);
+
+      const lines = ranked
+        .filter(m => m.votes > 0)
+        .map((m, i) => `${i + 1}. ${m.name} (${m.rank}) - ${m.votes} Oy`);
+
+      const text = lines.length
+        ? `Yasa İttifakı Oylama Sonuçları:
+${lines.join("
+")}`
+        : "Henüz hiç oy verilmedi.";
+
+      navigator.clipboard?.writeText(text).then(() => {
+        showToast("Sonuçlar panoya kopyalandı!");
+      }).catch(() => {
+        showToast("Kopyalama desteklenmiyor.");
+      });
+    }
+
+    async function resetAllVotes() {
+      const pin = prompt("Yönetici şifresini girin:");
+      if (pin !== ADMIN_PIN) {
+        showToast("Hatalı şifre!");
+        return;
+      }
+
+      const zeroCounts = {};
+      MEMBERS.forEach(m => { zeroCounts[m.id] = 0; });
+
+      if (isLiveFirebase && db) {
+        await setDoc(doc(db, "yasa_voting", "live_tally"), {
+          counts: zeroCounts,
+          updatedAt: serverTimestamp()
+        });
+      }
+
+      votesMap = zeroCounts;
+      saveLocalVotes(votesMap);
+      userSubmittedPicks = [];
+      selectedIds.clear();
+      saveUserPicks([]);
+      updateBottomBar();
+      renderAll();
+      openResultsModal();
+      showToast("Tüm oylar sıfırlandı.");
+    }
+
+    function renderAll() {
+      renderTabs();
+      renderGrid();
+      updateBottomBar();
+    }
+
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      renderGrid();
+    });
+
+    document.getElementById("sortSelect").addEventListener("change", (e) => {
+      sortMode = e.target.value;
+      renderGrid();
+    });
+
+    document.getElementById("clearSelectionBtn").addEventListener("click", () => {
+      selectedIds.clear();
+      updateBottomBar();
+      renderGrid();
+    });
+
+    document.getElementById("submitVotesBtn").addEventListener("click", submitVotes);
+    document.getElementById("openResultsBtn").addEventListener("click", openResultsModal);
+    document.getElementById("copyResultsBtn").addEventListener("click", copyResultsText);
+    document.getElementById("resetVotesBtn").addEventListener("click", resetAllVotes);
+
+    document.getElementById("openFirebaseBtn").addEventListener("click", () => {
+      document.getElementById("firebaseConfigInput").value = localStorage.getItem(STORAGE_FB_CONFIG_KEY) || "";
+      document.getElementById("firebaseModal").classList.add("open");
+    });
+
+    document.getElementById("saveFirebaseBtn").addEventListener("click", async () => {
+      const raw = document.getElementById("firebaseConfigInput").value;
+      try {
+        const parsed = parseFirebaseConfig(raw);
+        if (!parsed || !parsed.projectId) {
+          showToast("Geçerli bir firebaseConfig (projectId) girin.");
+          return;
+        }
+        localStorage.setItem(STORAGE_FB_CONFIG_KEY, JSON.stringify(parsed, null, 2));
+        document.getElementById("firebaseModal").classList.remove("open");
+        await initFirebase(parsed);
+        showToast("Firebase canlı bağlantısı kaydedildi!");
+      } catch {
+        showToast("JSON/Config formatı hatalı.");
+      }
+    });
+
+    document.getElementById("disconnectFirebaseBtn").addEventListener("click", async () => {
+      localStorage.removeItem(STORAGE_FB_CONFIG_KEY);
+      document.getElementById("firebaseConfigInput").value = "";
+      document.getElementById("firebaseModal").classList.remove("open");
+      await initFirebase(null);
+      showToast("Yerel moda geçildi.");
+    });
+
+    document.querySelectorAll("[data-close]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.getElementById(btn.dataset.close).classList.remove("open");
+      });
+    });
+
+    document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+      backdrop.addEventListener("click", (e) => {
+        if (e.target === backdrop) backdrop.classList.remove("open");
+      });
+    });
+
+    renderAll();
+
+    const savedCfgRaw = localStorage.getItem(STORAGE_FB_CONFIG_KEY);
+    if (savedCfgRaw) {
+      try {
+        initFirebase(JSON.parse(savedCfgRaw));
+      } catch {
+        setConnectionStatus(false, "Yerel Mod");
+      }
+    }
+  </script>
+</body>
+</html>
